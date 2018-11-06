@@ -14,7 +14,7 @@ var robot_mixer = {};
 var deadAnimator;
 var morphs = [];
 
-var duration = 20000; // ms
+var duration = 2000; // ms
 var currentTime = Date.now();
 
 var keypressed = false;
@@ -36,21 +36,29 @@ function createMap() {
     let enemy = new THREE.Mesh(geometry, material);
     enemy.position.x = 8;
 
+    enemy.tag = 'enemy';
+
     moveObjects.push(enemy);
+
+    objectMovement(enemy);
 
 
     maps.add(enemy);
 
     // Moneda
-    material = new THREE.MeshPhongMaterial({ color: 0xfafa02 });
-    geometry = new THREE.SphereGeometry(1);
+    material = new THREE.MeshPhongMaterial({ color: 0xfafa02, side:THREE.DoubleSide });
+    geometry = new THREE.CircleGeometry(1);
 
     // Create coin
     let coin = new THREE.Mesh(geometry, material);
     coin.position.z = -8;
 
+    coin.tag = 'coin';
+
     coinCollider = new THREE.Box3().setFromObject(coin);
     staticColliders.push(coinCollider);
+
+    objectMovement(coin);
 
     maps.add(coin);
 
@@ -86,12 +94,60 @@ function doesItCrash() {
     // Colliders with movement
     for (var collider of movementColliders) {
         if (mainCharBox.intersectsBox(collider)) {
-            console.log('Collides car');
+            console.log('Collides enemy');
             mainChar.position.x = 0;
             mainChar.position.y = 0;
             mainChar.position.z = 0;
         }
     }
+}
+
+function objectMovement(obj) {
+    switch(obj.tag) {
+        case 'enemy':
+            objAnimation = new KF.KeyFrameAnimator;
+            objAnimation.init({ 
+                interps:
+                    [
+                        { 
+                            keys:[0, .5, 1], 
+                            values:[
+                                    { z : 12 },
+                                    { z : -12 },
+                                    { z : 12 },
+                                    ],
+                            target:obj.position
+                        }
+                    ],
+                loop: true,
+                duration: duration
+            });
+            objAnimation.start();
+            break;
+
+        case 'coin':
+            objAnimation = new KF.KeyFrameAnimator;
+            objAnimation.init({ 
+                interps:
+                    [
+                        { 
+                            keys:[0, .5, 1], 
+                            values:[
+                                    { y : 0 },
+                                    { y : Math.PI },
+                                    { y : 2 * Math.PI },
+                                    ],
+                            target:obj.rotation
+                        }
+                    ],
+                loop: true,
+                duration: duration
+            });
+            objAnimation.start();
+            break;
+
+    } 
+
 }
 
 function loadFBX()
@@ -184,6 +240,9 @@ function run() {
 
         // Collider detection
         doesItCrash();
+
+        // Update KF
+        KF.update();
 
         // Update the camera controller
         orbitControls.update();
