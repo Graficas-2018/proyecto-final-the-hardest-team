@@ -20,27 +20,108 @@ var currentTime = Date.now();
 var keypressed = false;
 var move = null;
 
+var moveUp = false, moveDown = false, moveRight = false, moveLeft = false;
+
 var animation = "idle";
 
-var moveObjects = [], movementColliders = [], staticColliders = [];
+var moveObjects = [], movementColliders = [], staticColliders = [], removeObject = [];
 
-var coinCollider = null;
+var coinCollider = null, landCollider = null;
+
+var enemy;
 
 var mainCharBox;
 
 function createMap() {
+    // Floor
+    geometry = new THREE.PlaneGeometry(6, 16, 50, 50);
+    var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:0x5fba51, side:THREE.DoubleSide}));
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.position.y = -1;
+    mesh.tag = 'land';
+
+    landCollider = new THREE.Box3().setFromObject(mesh);
+    landCollider.tag = 'land'
+    staticColliders.push(landCollider);
+
+    maps.add(mesh);
+
+
+    // Enemy
     material = new THREE.MeshPhongMaterial({ color: 0x2354a3 });
     geometry = new THREE.SphereGeometry(1);
 
     // And put the geometry and material together into a mesh
-    let enemy = new THREE.Mesh(geometry, material);
+
+    enemy = new THREE.Mesh(geometry, material);
     enemy.position.x = 8;
 
     enemy.tag = 'enemy';
 
     moveObjects.push(enemy);
 
-    objectMovement(enemy);
+    objectMovement(enemy, true);
+
+
+    maps.add(enemy);
+
+    // And put the geometry and material together into a mesh
+    enemy = new THREE.Mesh(geometry, material);
+    enemy.position.x = 11;
+
+    enemy.tag = 'enemy';
+
+    moveObjects.push(enemy);
+
+    objectMovement(enemy, true);
+
+
+    maps.add(enemy);
+
+    enemy = new THREE.Mesh(geometry, material);
+    enemy.position.x = 14;
+
+    enemy.tag = 'enemy';
+
+    moveObjects.push(enemy);
+
+    objectMovement(enemy, false);
+
+
+    maps.add(enemy);
+
+    enemy = new THREE.Mesh(geometry, material);
+    enemy.position.x = 17;
+
+    enemy.tag = 'enemy';
+
+    moveObjects.push(enemy);
+
+    objectMovement(enemy, false);
+
+
+    maps.add(enemy);
+
+    enemy = new THREE.Mesh(geometry, material);
+    enemy.position.x = 20;
+
+    enemy.tag = 'enemy';
+
+    moveObjects.push(enemy);
+
+    objectMovement(enemy, true);
+
+
+    maps.add(enemy);
+
+    enemy = new THREE.Mesh(geometry, material);
+    enemy.position.x = 23;
+
+    enemy.tag = 'enemy';
+
+    moveObjects.push(enemy);
+
+    objectMovement(enemy, true);
 
 
     maps.add(enemy);
@@ -51,11 +132,16 @@ function createMap() {
 
     // Create coin
     let coin = new THREE.Mesh(geometry, material);
-    coin.position.z = -8;
+    coin.position.z = -12;
 
     coin.tag = 'coin';
 
     coinCollider = new THREE.Box3().setFromObject(coin);
+
+    coinCollider.tag = 'coin';
+    coinCollider.took = false;
+    coinCollider.object = coin;
+
     staticColliders.push(coinCollider);
 
     objectMovement(coin);
@@ -79,15 +165,26 @@ function updateMovementColliders() {
 }
 
 function doesItCrash() {
-    mainCharBox = new THREE.Box3().setFromCenterAndSize(mainChar.position, new THREE.Vector3( 1.5, 1.5, 1.5 ));
+    mainCharBox = new THREE.Box3().setFromCenterAndSize(mainChar.position, new THREE.Vector3( 2, 2, 2 ));
 
     // Static colliders
      for (var collider of staticColliders) {
         if (mainCharBox.intersectsBox(collider)) {
-            console.log('Collides coin');
-            mainChar.position.x = 0;
-            mainChar.position.y = 0;
-            mainChar.position.z = 0;
+            if (collider.tag == 'coin' && !collider.took) {
+                console.log('Collides coin');
+
+                collider.object.visible = false;
+                collider.took = true;
+                removeObject.push(collider);
+            } else {
+                if (collider.tag == 'land' ) {
+                    //console.log('land');
+                    removeObject = [];
+
+                }
+            }
+
+
         }
     }
 
@@ -98,31 +195,65 @@ function doesItCrash() {
             mainChar.position.x = 0;
             mainChar.position.y = 0;
             mainChar.position.z = 0;
+
+            recoverObjects();
         }
     }
 }
 
-function objectMovement(obj) {
+function recoverObjects() {
+    for (var collider of removeObject) {
+        collider.object.visible = true;
+        collider.took = false;
+    }
+
+    removeObject = [];
+}
+
+function objectMovement(obj, startPositive) {
     switch(obj.tag) {
         case 'enemy':
-            objAnimation = new KF.KeyFrameAnimator;
-            objAnimation.init({ 
-                interps:
-                    [
-                        { 
-                            keys:[0, .5, 1], 
-                            values:[
-                                    { z : 12 },
-                                    { z : -12 },
-                                    { z : 12 },
-                                    ],
-                            target:obj.position
-                        }
-                    ],
-                loop: true,
-                duration: duration
-            });
-            objAnimation.start();
+            if(startPositive) {
+                objAnimation = new KF.KeyFrameAnimator;
+                objAnimation.init({ 
+                    interps:
+                        [
+                            { 
+                                keys:[0, .5, 1], 
+                                values:[
+                                        { z : 12 },
+                                        { z : -12 },
+                                        { z : 12 },
+                                        ],
+                                target:obj.position
+                            }
+                        ],
+                    loop: true,
+                    duration: duration
+                });
+                objAnimation.start();    
+            } else {
+                objAnimation = new KF.KeyFrameAnimator;
+                objAnimation.init({ 
+                    interps:
+                        [
+                            { 
+                                keys:[0, .5, 1], 
+                                values:[
+                                        { z : -12 },
+                                        { z : 12 },
+                                        { z : -12 },
+                                        ],
+                                target:obj.position
+                            }
+                        ],
+                    loop: true,
+                    duration: duration
+                });
+                objAnimation.start();
+            break;
+            }
+
             break;
 
         case 'coin':
@@ -193,39 +324,47 @@ function loadFBX()
 
 function onKeyDown(event)
 {
-    if (!keypressed) {
-        //console.log(event.keyCode);
-        switch(event.keyCode)
-        {
-            case 38:
-                mainChar.position.z -= 2;
-                move = 'up';
-                break;
+    // Move diagonal ?
+    if (event.keyCode == 38)
+        moveUp = true;
 
-            case 37:
-                mainChar.position.x -= 2;
-                move = 'left';
-                break;
+    if (event.keyCode == 37)
+        moveLeft = true;
 
-            case 39:
-                mainChar.position.x += 2;
-                move = 'right';
-                break;
+    if (event.keyCode == 39)
+        moveRight = true;
 
-            case 40:
-                mainChar.position.z += 2;
-                move = 'up';
-                break;
-        }
-
-        //console.log(mainChar);
-        keypressed = true;
-    }
+    if (event.keyCode == 40)
+        moveDown = true;
 }
 
 function onKeyUp(event)
 {
-    keypressed = false;
+    if (event.keyCode == 38)
+        moveUp = false;
+
+    if (event.keyCode == 37)
+        moveLeft = false;
+
+    if (event.keyCode == 39)
+        moveRight = false;
+
+    if (event.keyCode == 40)
+        moveDown = false;
+}
+
+function makeMove() {
+    if (moveUp)
+        mainChar.position.z -= 0.2;
+
+    if (moveDown)
+        mainChar.position.z += 0.2;
+
+    if (moveLeft)
+        mainChar.position.x -= 0.2;
+
+    if (moveRight)
+        mainChar.position.x += 0.2;
 }
 
 
@@ -234,6 +373,9 @@ function run() {
     
         // Render the scene
         renderer.render( scene, camera );
+
+        // Move Character
+        makeMove();
 
         // Spin the cube for next frame
         updateMovementColliders();
