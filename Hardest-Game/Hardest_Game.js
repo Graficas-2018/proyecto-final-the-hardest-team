@@ -28,6 +28,8 @@ var moveObjects = [], movementColliders = [], staticColliders = [], removeObject
 
 var coinCollider = null, landCollider = null;
 
+var currentCheckpoint = null, coinCounter = 0;
+
 var enemy;
 
 var mainCharBox;
@@ -38,10 +40,29 @@ function createMap() {
     var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:0x5fba51, side:THREE.DoubleSide}));
     mesh.rotation.x = -Math.PI / 2;
     mesh.position.y = -1;
-    mesh.tag = 'land';
+    mesh.tag = 'checkpoint';
 
     landCollider = new THREE.Box3().setFromObject(mesh);
-    landCollider.tag = 'land'
+    landCollider.position = mesh.position;
+    landCollider.tag = 'checkpoint';
+    landCollider.isFinal = false;
+    staticColliders.push(landCollider);
+
+    currentCheckpoint = landCollider.position;
+
+    maps.add(mesh);
+
+    // Floor 2
+    mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:0x5fba51, side:THREE.DoubleSide}));
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.position.y = -1;
+    mesh.position.x = 31;
+    mesh.tag = 'checkpoint';
+
+    landCollider = new THREE.Box3().setFromObject(mesh);
+    landCollider.position = mesh.position;
+    landCollider.tag = 'checkpoint';
+    landCollider.isFinal = true;
     staticColliders.push(landCollider);
 
     maps.add(mesh);
@@ -132,7 +153,8 @@ function createMap() {
 
     // Create coin
     let coin = new THREE.Mesh(geometry, material);
-    coin.position.z = -12;
+    coin.position.z = -8;
+    coin.position.x = 15.15;
 
     coin.tag = 'coin';
 
@@ -141,6 +163,48 @@ function createMap() {
     coinCollider.tag = 'coin';
     coinCollider.took = false;
     coinCollider.object = coin;
+
+    staticColliders.push(coinCollider);
+
+    objectMovement(coin);
+
+    coinCounter++;
+
+    maps.add(coin);
+
+    // Coin 2
+    coin = new THREE.Mesh(geometry, material);
+    coin.position.z = 8;
+    coin.position.x = 9.5;
+
+    coin.tag = 'coin';
+
+    coinCollider = new THREE.Box3().setFromObject(coin);
+
+    coinCollider.tag = 'coin';
+    coinCollider.took = false;
+    coinCollider.object = coin;
+
+    staticColliders.push(coinCollider);
+
+    objectMovement(coin);
+    coinCounter++;
+
+    maps.add(coin);
+
+    // Coin 3
+    coin = new THREE.Mesh(geometry, material);
+    coin.position.z = 8;
+    coin.position.x = 21.5;
+
+    coin.tag = 'coin';
+
+    coinCollider = new THREE.Box3().setFromObject(coin);
+
+    coinCollider.tag = 'coin';
+    coinCollider.took = false;
+    coinCollider.object = coin;
+    coinCounter++;
 
     staticColliders.push(coinCollider);
 
@@ -175,11 +239,17 @@ function doesItCrash() {
 
                 collider.object.visible = false;
                 collider.took = true;
+                coinCounter--;
+                console.log(coinCounter);
                 removeObject.push(collider);
             } else {
-                if (collider.tag == 'land' ) {
+                if (collider.tag == 'checkpoint' ) {
                     //console.log('land');
+                    currentCheckpoint = collider.position;
                     removeObject = [];
+
+                    if (collider.isFinal && coinCounter == 0) 
+                        console.log('End of game');
 
                 }
             }
@@ -192,9 +262,7 @@ function doesItCrash() {
     for (var collider of movementColliders) {
         if (mainCharBox.intersectsBox(collider)) {
             console.log('Collides enemy');
-            mainChar.position.x = 0;
-            mainChar.position.y = 0;
-            mainChar.position.z = 0;
+            mainChar.position.set(currentCheckpoint.x, 0, currentCheckpoint.z);
 
             recoverObjects();
         }
@@ -205,6 +273,7 @@ function recoverObjects() {
     for (var collider of removeObject) {
         collider.object.visible = true;
         collider.took = false;
+        coinCounter++;
     }
 
     removeObject = [];
