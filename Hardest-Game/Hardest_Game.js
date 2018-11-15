@@ -7,7 +7,7 @@ robot_attack = null,
 flamingo = null,
 stork = null,
 group = null,
-maps = null,
+map = null,
 orbitControls = null;
 
 var robot_mixer = {};
@@ -26,7 +26,7 @@ var animation = "idle";
 
 var moveObjects = [], movementColliders = [], staticColliders = [], removeObject = [];
 
-var coinCollider = null, landCollider = null;
+var coinCollider = null, landCollider = null, floorCollide = false;
 
 var currentCheckpoint = null, coinCounter = 0;
 
@@ -35,37 +35,15 @@ var enemy;
 var mainCharBox;
 
 function createMap() {
-    // Floor
-    geometry = new THREE.PlaneGeometry(6, 16, 50, 50);
-    var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:0x5fba51, side:THREE.DoubleSide}));
-    mesh.rotation.x = -Math.PI / 2;
-    mesh.position.y = -1;
-    mesh.tag = 'checkpoint';
 
-    landCollider = new THREE.Box3().setFromObject(mesh);
-    landCollider.position = mesh.position;
-    landCollider.tag = 'checkpoint';
-    landCollider.isFinal = false;
-    staticColliders.push(landCollider);
+    // Checkpoints
+    createCheckpoint(6, 16, new THREE.Vector3(0, 0, 0));
+    createCheckpoint(6, 16, new THREE.Vector3(31, 0, 0));
 
-    currentCheckpoint = landCollider.position;
-
-    maps.add(mesh);
-
-    // Floor 2
-    mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:0x5fba51, side:THREE.DoubleSide}));
-    mesh.rotation.x = -Math.PI / 2;
-    mesh.position.y = -1;
-    mesh.position.x = 31;
-    mesh.tag = 'checkpoint';
-
-    landCollider = new THREE.Box3().setFromObject(mesh);
-    landCollider.position = mesh.position;
-    landCollider.tag = 'checkpoint';
-    landCollider.isFinal = true;
-    staticColliders.push(landCollider);
-
-    maps.add(mesh);
+    // Common Land
+    createLand(4, 16, new THREE.Vector3( 5, 0, 0 ));
+    createLand(4, 16, new THREE.Vector3( 26, 0, 0 ));
+    createLand(17, 26, new THREE.Vector3(15.5, 0, 0));
 
 
     // Enemy
@@ -84,7 +62,7 @@ function createMap() {
     objectMovement(enemy, true);
 
 
-    maps.add(enemy);
+    map.add(enemy);
 
     // And put the geometry and material together into a mesh
     enemy = new THREE.Mesh(geometry, material);
@@ -97,7 +75,7 @@ function createMap() {
     objectMovement(enemy, true);
 
 
-    maps.add(enemy);
+    map.add(enemy);
 
     enemy = new THREE.Mesh(geometry, material);
     enemy.position.x = 14;
@@ -109,7 +87,7 @@ function createMap() {
     objectMovement(enemy, false);
 
 
-    maps.add(enemy);
+    map.add(enemy);
 
     enemy = new THREE.Mesh(geometry, material);
     enemy.position.x = 17;
@@ -121,7 +99,7 @@ function createMap() {
     objectMovement(enemy, false);
 
 
-    maps.add(enemy);
+    map.add(enemy);
 
     enemy = new THREE.Mesh(geometry, material);
     enemy.position.x = 20;
@@ -133,7 +111,7 @@ function createMap() {
     objectMovement(enemy, true);
 
 
-    maps.add(enemy);
+    map.add(enemy);
 
     enemy = new THREE.Mesh(geometry, material);
     enemy.position.x = 23;
@@ -145,7 +123,7 @@ function createMap() {
     objectMovement(enemy, true);
 
 
-    maps.add(enemy);
+    map.add(enemy);
 
     // Moneda
     material = new THREE.MeshPhongMaterial({ color: 0xfafa02, side:THREE.DoubleSide });
@@ -170,7 +148,7 @@ function createMap() {
 
     coinCounter++;
 
-    maps.add(coin);
+    map.add(coin);
 
     // Coin 2
     coin = new THREE.Mesh(geometry, material);
@@ -190,7 +168,7 @@ function createMap() {
     objectMovement(coin);
     coinCounter++;
 
-    maps.add(coin);
+    map.add(coin);
 
     // Coin 3
     coin = new THREE.Mesh(geometry, material);
@@ -210,7 +188,62 @@ function createMap() {
 
     objectMovement(coin);
 
-    maps.add(coin);
+    map.add(coin);
+
+}
+
+function createCheckpoint(width, height, position) {
+    geometry = new THREE.PlaneGeometry(width, height, 50, 50);
+    var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:0x5fba51, side:THREE.DoubleSide}));
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.position.set(position.x, position.y, position.z);
+    mesh.position.y = -1;
+    mesh.tag = 'checkpoint';
+
+    landCollider = new THREE.Box3().setFromObject(mesh);
+    landCollider.position = mesh.position;
+    landCollider.tag = 'checkpoint';
+    landCollider.isFinal = false;
+    staticColliders.push(landCollider);
+
+    currentCheckpoint = landCollider.position;
+
+    map.add(mesh);
+}
+
+function createLand(width, height, position) {
+
+    console.log(position);
+
+
+    // Create a texture map
+    var floor = new THREE.TextureLoader().load(floorUrl);
+    floor.wrapS = floor.wrapT = THREE.RepeatWrapping;
+    // floor.repeat.set(4, 4);
+
+    var color = 0xffffff;
+
+    // Put in a ground plane to show off the lighting
+    geometry = new THREE.PlaneGeometry(width, height, 50, 50);
+    var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:color, map:floor, side:THREE.DoubleSide}));
+
+    mesh.rotation.x = -Math.PI / 2;
+
+    mesh.position.set(position.x, position.y, position.z);
+
+    landCollider = new THREE.Box3().setFromObject(mesh);
+    landCollider.position = mesh.position;
+    landCollider.tag = 'floor';
+    staticColliders.push(landCollider);
+
+
+    //mesh.position.x = 5;
+    mesh.position.y = -1;
+    
+    // Add the mesh to our group
+    map.add( mesh );
+    mesh.castShadow = false;
+    mesh.receiveShadow = true;
 
 }
 
@@ -234,6 +267,7 @@ function doesItCrash() {
     // Static colliders
      for (var collider of staticColliders) {
         if (mainCharBox.intersectsBox(collider)) {
+            floorCollide = true;
             if (collider.tag == 'coin' && !collider.took) {
                 console.log('Collides coin');
 
@@ -257,6 +291,11 @@ function doesItCrash() {
 
         }
     }
+
+    if (!floorCollide)
+        mainChar.position.set(currentCheckpoint.x, 0, currentCheckpoint.z);
+
+    floorCollide = false;
 
     // Colliders with movement
     for (var collider of movementColliders) {
@@ -471,7 +510,7 @@ function setLightColor(light, r, g, b)
 var directionalLight = null;
 var spotLight = null;
 var ambientLight = null;
-var mapUrl = "../images/checker_large.gif";
+var floorUrl = "../images/checker_large.gif";
 
 var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 2048;
 
@@ -527,25 +566,6 @@ function createScene(canvas) {
     group = new THREE.Object3D;
     root.add(group);
 
-    // Create a texture map
-    var map = new THREE.TextureLoader().load(mapUrl);
-    map.wrapS = map.wrapT = THREE.RepeatWrapping;
-    map.repeat.set(8, 8);
-
-    var color = 0xffffff;
-
-    // Put in a ground plane to show off the lighting
-    geometry = new THREE.PlaneGeometry(200, 200, 50, 50);
-    var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:color, map:map, side:THREE.DoubleSide}));
-
-    mesh.rotation.x = -Math.PI / 2;
-    mesh.position.y = -2;
-    
-    // Add the mesh to our group
-    group.add( mesh );
-    mesh.castShadow = false;
-    mesh.receiveShadow = true;
-
     var material = new THREE.MeshPhongMaterial({ color: 0xc92100 });
     geometry = new THREE.CubeGeometry(2, 2, 2);
 
@@ -555,8 +575,8 @@ function createScene(canvas) {
     //mainCharBoxHelper =new THREE.BoxHelper(mainChar, 0x00ff00);
     root.add(mainChar);
 
-    maps = new THREE.Object3D;
-    root.add(maps);
+    map = new THREE.Object3D;
+    root.add(map);
 
     createMap();
     
