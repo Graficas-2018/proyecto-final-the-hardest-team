@@ -34,7 +34,7 @@ var enemy;
 
 var mainCharBox;
 
-var whichLevel = 1;
+var whichLevel = 3;
 
 function createMap(theLevel) {
 
@@ -50,12 +50,12 @@ function createMap(theLevel) {
             createLand(17, 26, new THREE.Vector3(15.5, 0, 0));
 
             // Create Enemies
-            createEnemy(new THREE.Vector3(8, 0, 0), true);
-            createEnemy(new THREE.Vector3(11, 0, 0), true);
-            createEnemy(new THREE.Vector3(14, 0, 0), false);
-            createEnemy(new THREE.Vector3(17, 0, 0), false);
-            createEnemy(new THREE.Vector3(20, 0, 0), true);
-            createEnemy(new THREE.Vector3(23, 0, 0), true);
+            createEnemy(new THREE.Vector3(8, 0, 0), 'z', 12, -12);
+            createEnemy(new THREE.Vector3(11, 0, 0), 'z', 12, -12);
+            createEnemy(new THREE.Vector3(14, 0, 0), 'z', -12, 12);
+            createEnemy(new THREE.Vector3(17, 0, 0), 'z', -12, 12);
+            createEnemy(new THREE.Vector3(20, 0, 0), 'z', 12, -12);
+            createEnemy(new THREE.Vector3(23, 0, 0), 'z', 12, -12);
 
             // Create coins
             createCoin(new THREE.Vector3(15.15, 0, -8));
@@ -71,18 +71,44 @@ function createMap(theLevel) {
             // Common Land
             createLand(50, 13, new THREE.Vector3(21, 0, 9.5));
 
+            // Create Enemies
+            createEnemy(new THREE.Vector3(0, 0, 4.5), 'x', -4, 46);
+            createEnemy(new THREE.Vector3(0, 0, 7.5), 'x', -4, 46);
+            createEnemy(new THREE.Vector3(0, 0, 10.5), 'x', 46, -4);
+            createEnemy(new THREE.Vector3(0, 0, 13.5), 'x', 46, -4);
+
             // Create coins
             createCoin(new THREE.Vector3(21, 0, 6));
             createCoin(new THREE.Vector3(21, 0, 12));
 
             break;
+
+        case 3:
+            // Checkpoints
+            createCheckpoint(6, 6, new THREE.Vector3(0, 0, 0), true);
+
+            // Common Land
+            createLand(53, 6, new THREE.Vector3(29.5, 0, 0));
+            createLand(4, 4, new THREE.Vector3(16, 0, -5));
+            createLand(4, 4, new THREE.Vector3(26, 0, 5));
+            createLand(4, 4, new THREE.Vector3(36, 0, -5));
+            createLand(4, 4, new THREE.Vector3(46, 0, 5));
+
+            // Create Enemies
+            createEnemy(new THREE.Vector3(0, 0, -1.5), 'x', 3, 25);
+            createEnemy(new THREE.Vector3(0, 0, 1.5), 'x', 3, 25);
+            createEnemy(new THREE.Vector3(0, 0, -1.5), 'x', 25, 50);
+            createEnemy(new THREE.Vector3(0, 0, 1.5), 'x', 25, 50);
+
+            // Create coins
+            createCoin(new THREE.Vector3(53, 0, 0));
     }
 
     
 
 }
 
-function createEnemy(position, startPositive) {
+function createEnemy(position, movementAxis, startPosition, endPosition) {
     material = new THREE.MeshPhongMaterial({ color: 0x2354a3 });
     geometry = new THREE.SphereGeometry(1);
     // And put the geometry and material together into a mesh
@@ -94,7 +120,7 @@ function createEnemy(position, startPositive) {
 
     moveObjects.push(enemy);
 
-    objectMovement(enemy, startPositive);
+    objectMovement(enemy, movementAxis, startPosition, endPosition);
 
 
     map.add(enemy);
@@ -276,10 +302,10 @@ function changeLevel(theLevel) {
 
 }
 
-function objectMovement(obj, startPositive) {
+function objectMovement(obj, axis, startPosition, endPosition) {
     switch(obj.tag) {
         case 'enemy':
-            if(startPositive) {
+            if(axis == 'z') {
                 objAnimation = new KF.KeyFrameAnimator;
                 objAnimation.init({ 
                     interps:
@@ -287,9 +313,9 @@ function objectMovement(obj, startPositive) {
                             { 
                                 keys:[0, .5, 1], 
                                 values:[
-                                        { z : 12 },
-                                        { z : -12 },
-                                        { z : 12 },
+                                        { z : startPosition },
+                                        { z : endPosition },
+                                        { z : startPosition },
                                         ],
                                 target:obj.position
                             }
@@ -306,9 +332,9 @@ function objectMovement(obj, startPositive) {
                             { 
                                 keys:[0, .5, 1], 
                                 values:[
-                                        { z : -12 },
-                                        { z : 12 },
-                                        { z : -12 },
+                                        { x : startPosition },
+                                        { x : endPosition },
+                                        { x : startPosition },
                                         ],
                                 target:obj.position
                             }
