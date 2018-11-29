@@ -37,8 +37,8 @@ var mainCharBox;
 function createMap() {
 
     // Checkpoints
-    createCheckpoint(6, 16, new THREE.Vector3(0, 0, 0));
-    createCheckpoint(6, 16, new THREE.Vector3(31, 0, 0));
+    createCheckpoint(6, 16, new THREE.Vector3(0, 0, 0), false);
+    createCheckpoint(6, 16, new THREE.Vector3(31, 0, 0), true);
 
     // Common Land
     createLand(4, 16, new THREE.Vector3( 5, 0, 0 ));
@@ -248,7 +248,7 @@ function createCoin(position) {
     map.add(coin);
 }
 
-function createCheckpoint(width, height, position) {
+function createCheckpoint(width, height, position, final) {
     geometry = new THREE.PlaneGeometry(width, height, 50, 50);
     var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:0x5fba51, side:THREE.DoubleSide}));
     mesh.rotation.x = -Math.PI / 2;
@@ -259,7 +259,7 @@ function createCheckpoint(width, height, position) {
     landCollider = new THREE.Box3().setFromObject(mesh);
     landCollider.position = mesh.position;
     landCollider.tag = 'checkpoint';
-    landCollider.isFinal = false;
+    landCollider.isFinal = final;
     staticColliders.push(landCollider);
 
     currentCheckpoint = landCollider.position;
@@ -348,8 +348,10 @@ function doesItCrash() {
         }
     }
 
-    if (!floorCollide)
+    if (!floorCollide) {
         mainChar.position.set(currentCheckpoint.x, 0, currentCheckpoint.z);
+        recoverObjects();
+    }
 
     floorCollide = false;
 
