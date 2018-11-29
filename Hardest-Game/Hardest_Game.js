@@ -47,6 +47,7 @@ function createMap() {
 
 
     // Enemy
+    /*
     material = new THREE.MeshPhongMaterial({ color: 0x2354a3 });
     geometry = new THREE.SphereGeometry(1);
 
@@ -63,6 +64,7 @@ function createMap() {
 
 
     map.add(enemy);
+
 
     // And put the geometry and material together into a mesh
     enemy = new THREE.Mesh(geometry, material);
@@ -126,7 +128,7 @@ function createMap() {
     map.add(enemy);
 
     // Moneda
-    material = new THREE.MeshPhongMaterial({ color: 0xfafa02, side:THREE.DoubleSide });
+    /*material = new THREE.MeshPhongMaterial({ color: 0xfafa02, side:THREE.DoubleSide });
     geometry = new THREE.CircleGeometry(1);
 
     // Create coin
@@ -188,8 +190,62 @@ function createMap() {
 
     objectMovement(coin);
 
-    map.add(coin);
+    map.add(coin);*/
 
+    // Create Enemies
+    createEnemy(new THREE.Vector3(8, 0, 0), true);
+    createEnemy(new THREE.Vector3(11, 0, 0), true);
+    createEnemy(new THREE.Vector3(14, 0, 0), false);
+    createEnemy(new THREE.Vector3(17, 0, 0), false);
+    createEnemy(new THREE.Vector3(20, 0, 0), true);
+    createEnemy(new THREE.Vector3(23, 0, 0), true);
+
+    // Create coins
+    createCoin(new THREE.Vector3(15.15, 0, -8));
+    createCoin(new THREE.Vector3(9.5, 0, 8));
+    createCoin(new THREE.Vector3(21.5, 0, 8));
+
+}
+
+function createEnemy(position, startPositive) {
+    material = new THREE.MeshPhongMaterial({ color: 0x2354a3 });
+    geometry = new THREE.SphereGeometry(1);
+    // And put the geometry and material together into a mesh
+
+    enemy = new THREE.Mesh(geometry, material);
+    enemy.position.set(position.x, position.y, position.z);
+
+    enemy.tag = 'enemy';
+
+    moveObjects.push(enemy);
+
+    objectMovement(enemy, startPositive);
+
+
+    map.add(enemy);
+}
+
+function createCoin(position) {
+    material = new THREE.MeshPhongMaterial({ color: 0xfafa02, side:THREE.DoubleSide });
+    geometry = new THREE.CircleGeometry(1);
+    let coin = new THREE.Mesh(geometry, material);
+
+    coin.position.set(position.x, position.y, position.z)
+
+    coin.tag = 'coin';
+
+    coinCollider = new THREE.Box3().setFromObject(coin);
+
+    coinCollider.tag = 'coin';
+    coinCollider.took = false;
+    coinCollider.object = coin;
+    coinCounter++;
+
+    staticColliders.push(coinCollider);
+
+    objectMovement(coin);
+
+    map.add(coin);
 }
 
 function createCheckpoint(width, height, position) {
