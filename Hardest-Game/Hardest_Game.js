@@ -20,7 +20,7 @@ var currentTime = Date.now();
 var keypressed = false;
 var move = null;
 
-var moveUp = false, moveDown = false, moveRight = false, moveLeft = false;
+var moveUp = false, moveDown = false, moveRight = false, moveLeft = false, jump = false;
 
 var animation = "idle";
 
@@ -36,6 +36,9 @@ var mainCharBox;
 
 var whichLevel = 1;
 
+var blackHoleTexture = new THREE.TextureLoader().load('../images/blackHole.png');
+var jumpAnimation = null;
+
 function createMap(theLevel) {
 
     switch(theLevel) {
@@ -48,6 +51,9 @@ function createMap(theLevel) {
             createLand(4, 16, new THREE.Vector3( 5, 0, 0 ));
             createLand(4, 16, new THREE.Vector3( 26, 0, 0 ));
             createLand(17, 26, new THREE.Vector3(15.5, 0, 0));
+
+            // Create Hole
+            createBlackHole(3, new THREE.Vector3(7, 0, 0));
 
             // Create Enemies
             createEnemy(new THREE.Vector3(8, 0, 0), 'z', 12, -12);
@@ -105,6 +111,39 @@ function createMap(theLevel) {
     }
 
     
+
+}
+
+function createBlackHole(circLeSize, position) {
+    material = new THREE.MeshPhongMaterial({color:0xffffff, map:blackHoleTexture, side:THREE.DoubleSide});
+    geometry = new THREE.CircleGeometry(circLeSize, 32);
+
+    let mesh = new THREE.Mesh(geometry, material);
+
+    mesh.rotation.x = -Math.PI / 2;
+
+    mesh.position.set(position.x, position.y, position.z);
+
+    mesh.tag = 'blackHole';
+
+    landCollider = new THREE.Box3().setFromObject(mesh);
+    landCollider.position = mesh.position;
+    landCollider.tag = 'blackHole';
+
+    staticColliders.push(landCollider);
+
+    objectMovement(mesh);
+
+
+    //mesh.position.x = 5;
+    mesh.position.y = -0.98;
+    
+    // Add the mesh to our group
+    map.add( mesh );
+    mesh.castShadow = false;
+    mesh.receiveShadow = true;
+
+
 
 }
 
@@ -232,6 +271,7 @@ function doesItCrash() {
      for (var collider of staticColliders) {
         if (mainCharBox.intersectsBox(collider)) {
             floorCollide = true;
+
             if (collider.tag == 'coin' && !collider.took) {
                 console.log('Collides coin');
 
@@ -252,6 +292,10 @@ function doesItCrash() {
                         changeLevel(whichLevel);
                     }
 
+                } else {
+                    if (collider.tag == 'blackHole') {
+                        floorCollide = false;
+                    }
                 }
             }
 
@@ -368,6 +412,27 @@ function objectMovement(obj, axis, startPosition, endPosition) {
             objAnimation.start();
             break;
 
+        case 'blackHole':
+            objAnimation = new KF.KeyFrameAnimator;
+            objAnimation.init({ 
+                interps:
+                    [
+                        { 
+                            keys:[0, .5, 1], 
+                            values:[
+                                    { z : 0 },
+                                    { z : Math.PI },
+                                    { z : 2 * Math.PI },
+                                    ],
+                            target:obj.rotation
+                        }
+                    ],
+                loop: true,
+                duration: duration * 3
+            });
+            objAnimation.start();
+            break;
+
     } 
 
 }
@@ -427,6 +492,9 @@ function onKeyDown(event)
 
     if (event.keyCode == 40)
         moveDown = true;
+
+    if (event.keyCode == 32)
+        makeJump();
 }
 
 function onKeyUp(event)
@@ -573,6 +641,26 @@ function createScene(canvas) {
 
     //mainCharBoxHelper =new THREE.BoxHelper(mainChar, 0x00ff00);
     root.add(mainChar);
+
+
+    // Create jump animation
+    jumpAnimation = new KF.KeyFrameAnimator;
+    jumpAnimation.init({ 
+        interps:
+        [
+            {
+                keys:[0, .5, 1],
+                values:[
+                        { y : 0 },
+                        { y : 10 },
+                        { y : 0},
+                        ],
+                target:mainChar.position
+            }
+        ],
+        loop: false,
+        duration: duration
+    });
 
     map = new THREE.Object3D;
     root.add(map);
