@@ -34,176 +34,51 @@ var enemy;
 
 var mainCharBox;
 
-function createMap() {
-
-    // Checkpoints
-    createCheckpoint(6, 16, new THREE.Vector3(0, 0, 0), false);
-    createCheckpoint(6, 16, new THREE.Vector3(31, 0, 0), true);
-
-    // Common Land
-    createLand(4, 16, new THREE.Vector3( 5, 0, 0 ));
-    createLand(4, 16, new THREE.Vector3( 26, 0, 0 ));
-    createLand(17, 26, new THREE.Vector3(15.5, 0, 0));
-
-
-    // Enemy
-    /*
-    material = new THREE.MeshPhongMaterial({ color: 0x2354a3 });
-    geometry = new THREE.SphereGeometry(1);
-
-    // And put the geometry and material together into a mesh
-
-    enemy = new THREE.Mesh(geometry, material);
-    enemy.position.x = 8;
-
-    enemy.tag = 'enemy';
-
-    moveObjects.push(enemy);
-
-    objectMovement(enemy, true);
-
-
-    map.add(enemy);
-
-
-    // And put the geometry and material together into a mesh
-    enemy = new THREE.Mesh(geometry, material);
-    enemy.position.x = 11;
-
-    enemy.tag = 'enemy';
-
-    moveObjects.push(enemy);
-
-    objectMovement(enemy, true);
-
-
-    map.add(enemy);
-
-    enemy = new THREE.Mesh(geometry, material);
-    enemy.position.x = 14;
-
-    enemy.tag = 'enemy';
-
-    moveObjects.push(enemy);
-
-    objectMovement(enemy, false);
-
-
-    map.add(enemy);
-
-    enemy = new THREE.Mesh(geometry, material);
-    enemy.position.x = 17;
-
-    enemy.tag = 'enemy';
-
-    moveObjects.push(enemy);
-
-    objectMovement(enemy, false);
-
-
-    map.add(enemy);
-
-    enemy = new THREE.Mesh(geometry, material);
-    enemy.position.x = 20;
-
-    enemy.tag = 'enemy';
-
-    moveObjects.push(enemy);
-
-    objectMovement(enemy, true);
-
-
-    map.add(enemy);
-
-    enemy = new THREE.Mesh(geometry, material);
-    enemy.position.x = 23;
-
-    enemy.tag = 'enemy';
-
-    moveObjects.push(enemy);
-
-    objectMovement(enemy, true);
-
-
-    map.add(enemy);
-
-    // Moneda
-    /*material = new THREE.MeshPhongMaterial({ color: 0xfafa02, side:THREE.DoubleSide });
-    geometry = new THREE.CircleGeometry(1);
-
-    // Create coin
-    let coin = new THREE.Mesh(geometry, material);
-    coin.position.z = -8;
-    coin.position.x = 15.15;
-
-    coin.tag = 'coin';
-
-    coinCollider = new THREE.Box3().setFromObject(coin);
-
-    coinCollider.tag = 'coin';
-    coinCollider.took = false;
-    coinCollider.object = coin;
-
-    staticColliders.push(coinCollider);
-
-    objectMovement(coin);
-
-    coinCounter++;
-
-    map.add(coin);
-
-    // Coin 2
-    coin = new THREE.Mesh(geometry, material);
-    coin.position.z = 8;
-    coin.position.x = 9.5;
-
-    coin.tag = 'coin';
-
-    coinCollider = new THREE.Box3().setFromObject(coin);
-
-    coinCollider.tag = 'coin';
-    coinCollider.took = false;
-    coinCollider.object = coin;
-
-    staticColliders.push(coinCollider);
-
-    objectMovement(coin);
-    coinCounter++;
-
-    map.add(coin);
-
-    // Coin 3
-    coin = new THREE.Mesh(geometry, material);
-    coin.position.z = 8;
-    coin.position.x = 21.5;
-
-    coin.tag = 'coin';
-
-    coinCollider = new THREE.Box3().setFromObject(coin);
-
-    coinCollider.tag = 'coin';
-    coinCollider.took = false;
-    coinCollider.object = coin;
-    coinCounter++;
-
-    staticColliders.push(coinCollider);
-
-    objectMovement(coin);
-
-    map.add(coin);*/
-
-    // Create Enemies
-    createEnemy(new THREE.Vector3(8, 0, 0), true);
-    createEnemy(new THREE.Vector3(11, 0, 0), true);
-    createEnemy(new THREE.Vector3(14, 0, 0), false);
-    createEnemy(new THREE.Vector3(17, 0, 0), false);
-    createEnemy(new THREE.Vector3(20, 0, 0), true);
-    createEnemy(new THREE.Vector3(23, 0, 0), true);
-
-    // Create coins
-    createCoin(new THREE.Vector3(15.15, 0, -8));
-    createCoin(new THREE.Vector3(9.5, 0, 8));
-    createCoin(new THREE.Vector3(21.5, 0, 8));
+var whichLevel = 1;
+
+function createMap(theLevel) {
+
+    switch(theLevel) {
+        case 1:
+            // Checkpoints
+            createCheckpoint(6, 16, new THREE.Vector3(0, 0, 0), false);
+            createCheckpoint(6, 16, new THREE.Vector3(31, 0, 0), true);
+
+            // Common Land
+            createLand(4, 16, new THREE.Vector3( 5, 0, 0 ));
+            createLand(4, 16, new THREE.Vector3( 26, 0, 0 ));
+            createLand(17, 26, new THREE.Vector3(15.5, 0, 0));
+
+            // Create Enemies
+            createEnemy(new THREE.Vector3(8, 0, 0), true);
+            createEnemy(new THREE.Vector3(11, 0, 0), true);
+            createEnemy(new THREE.Vector3(14, 0, 0), false);
+            createEnemy(new THREE.Vector3(17, 0, 0), false);
+            createEnemy(new THREE.Vector3(20, 0, 0), true);
+            createEnemy(new THREE.Vector3(23, 0, 0), true);
+
+            // Create coins
+            createCoin(new THREE.Vector3(15.15, 0, -8));
+            createCoin(new THREE.Vector3(9.5, 0, 8));
+            createCoin(new THREE.Vector3(21.5, 0, 8));
+            break;
+
+        case 2:
+            // Checkpoints
+            createCheckpoint(8, 6, new THREE.Vector3(0, 0, 0), false);
+            createCheckpoint(8, 6, new THREE.Vector3(42, 0, 19), true);
+
+            // Common Land
+            createLand(50, 13, new THREE.Vector3(21, 0, 9.5));
+
+            // Create coins
+            createCoin(new THREE.Vector3(21, 0, 6));
+            createCoin(new THREE.Vector3(21, 0, 12));
+
+            break;
+    }
+
+    
 
 }
 
@@ -260,6 +135,13 @@ function createCheckpoint(width, height, position, final) {
     landCollider.position = mesh.position;
     landCollider.tag = 'checkpoint';
     landCollider.isFinal = final;
+
+    if (!final) {
+        mainChar.position.set(mesh.position.x, mainChar.position.y, mesh.position.z);
+        console.log('entra');
+    }
+
+
     staticColliders.push(landCollider);
 
     currentCheckpoint = landCollider.position;
@@ -338,8 +220,11 @@ function doesItCrash() {
                     currentCheckpoint = collider.position;
                     removeObject = [];
 
-                    if (collider.isFinal && coinCounter == 0) 
+                    if (collider.isFinal && coinCounter == 0) {
                         console.log('End of game');
+                        whichLevel++;
+                        changeLevel(whichLevel);
+                    }
 
                 }
             }
@@ -374,6 +259,21 @@ function recoverObjects() {
     }
 
     removeObject = [];
+}
+
+function changeLevel(theLevel) {
+   removeObject = [];
+   moveObjects = [];
+   staticColliders = [];
+   movementColliders = [];
+
+   for (var i = map.children.length - 1; i >= 0; i--) {
+    map.remove(map.children[i])
+   }
+
+   createMap(theLevel);
+
+
 }
 
 function objectMovement(obj, startPositive) {
@@ -417,7 +317,6 @@ function objectMovement(obj, startPositive) {
                     duration: duration
                 });
                 objAnimation.start();
-            break;
             }
 
             break;
@@ -636,7 +535,7 @@ function createScene(canvas) {
     map = new THREE.Object3D;
     root.add(map);
 
-    createMap();
+    createMap(whichLevel);
     
     // Now add the group to our scene
     scene.add( root );
