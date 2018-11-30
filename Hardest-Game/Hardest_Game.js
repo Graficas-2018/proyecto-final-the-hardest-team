@@ -20,7 +20,7 @@ var currentTime = Date.now();
 var keypressed = false;
 var move = null;
 
-var moveUp = false, moveDown = false, moveRight = false, moveLeft = false, jump = false;
+var moveUp = false, moveDown = false, moveRight = false, moveLeft = false, jump = false, jumping = false;
 
 var animation = "idle";
 
@@ -35,6 +35,8 @@ var enemy;
 var mainCharBox;
 
 var whichLevel = 1;
+
+var jumpPosition = 0;
 
 var blackHoleTexture = new THREE.TextureLoader().load('../images/blackHole.png');
 var jumpAnimation = null;
@@ -53,7 +55,8 @@ function createMap(theLevel) {
             createLand(17, 26, new THREE.Vector3(15.5, 0, 0));
 
             // Create Hole
-            createBlackHole(3, new THREE.Vector3(7, 0, 0));
+            createBlackHole(3, new THREE.Vector3(7, 0, 0), false);
+            createBlackHole(3, new THREE.Vector3(24, 0, 0), false);
 
             // Create Enemies
             createEnemy(new THREE.Vector3(8, 0, 0), 'z', 12, -12);
@@ -76,6 +79,12 @@ function createMap(theLevel) {
 
             // Common Land
             createLand(50, 13, new THREE.Vector3(21, 0, 9.5));
+
+            // Create Blackhole
+            createBlackHole(2, new THREE.Vector3(10, 0, 14), false);
+            createBlackHole(2, new THREE.Vector3(10, 0, 5), false);
+            createBlackHole(2, new THREE.Vector3(32, 0, 14), false);
+            createBlackHole(2, new THREE.Vector3(32, 0, 5), false);
 
             // Create Enemies
             createEnemy(new THREE.Vector3(0, 0, 4.5), 'x', -4, 46);
@@ -100,6 +109,10 @@ function createMap(theLevel) {
             createLand(4, 4, new THREE.Vector3(36, 0, -5));
             createLand(4, 4, new THREE.Vector3(46, 0, 5));
 
+            // Create Blackhole
+            createBlackHole(1, new THREE.Vector3(25, 0, 0), true);
+
+
             // Create Enemies
             createEnemy(new THREE.Vector3(0, 0, -1.5), 'x', 3, 25);
             createEnemy(new THREE.Vector3(0, 0, 1.5), 'x', 3, 25);
@@ -114,7 +127,7 @@ function createMap(theLevel) {
 
 }
 
-function createBlackHole(circLeSize, position) {
+function createBlackHole(circLeSize, position, animatedSizing) {
     material = new THREE.MeshPhongMaterial({color:0xffffff, map:blackHoleTexture, side:THREE.DoubleSide});
     geometry = new THREE.CircleGeometry(circLeSize, 32);
 
@@ -124,13 +137,18 @@ function createBlackHole(circLeSize, position) {
 
     mesh.position.set(position.x, position.y, position.z);
 
-    mesh.tag = 'blackHole';
+    if (animatedSizing) {
+        mesh.tag = 'blackHole-sizing';
+        moveObjects.push(mesh);    
+    }
+    else {
+        mesh.tag = 'blackHole';
+        landCollider = new THREE.Box3().setFromObject(mesh);
+        landCollider.position = mesh.position;
+        landCollider.tag = 'blackHole';
 
-    landCollider = new THREE.Box3().setFromObject(mesh);
-    landCollider.position = mesh.position;
-    landCollider.tag = 'blackHole';
-
-    staticColliders.push(landCollider);
+        staticColliders.push(landCollider);
+    }
 
     objectMovement(mesh);
 
@@ -254,11 +272,8 @@ function updateMovementColliders() {
     movementColliders = [];
     for (var moveColliders of moveObjects) {
         cubeBBox = new THREE.Box3().setFromObject(moveColliders);
-        if (moveColliders.tag == 'wood') {
-            //console.log('wood');
-            cubeBBox.tag = 'wood'
-            cubeBBox.theObject = movementColliders;
-        }
+        if (moveColliders.tag == 'blackHole-sizing')
+            cubeBBox.tag = 'blackHole-sizing';
 
         movementColliders.push(cubeBBox);
     }
@@ -303,22 +318,26 @@ function doesItCrash() {
         }
     }
 
-    if (!floorCollide) {
+    // Colliders with movement
+    for (var collider of movementColliders) {
+        if (mainCharBox.intersectsBox(collider)) {
+            if (collider.tag == 'blackHole-sizing')
+                floorCollide = false;
+
+            else {
+                console.log('Collides enemy');
+                mainChar.position.set(currentCheckpoint.x, 0, currentCheckpoint.z);
+                recoverObjects();
+            }
+        }
+    }
+
+    if (!floorCollide && !jumping) {
         mainChar.position.set(currentCheckpoint.x, 0, currentCheckpoint.z);
         recoverObjects();
     }
 
     floorCollide = false;
-
-    // Colliders with movement
-    for (var collider of movementColliders) {
-        if (mainCharBox.intersectsBox(collider)) {
-            console.log('Collides enemy');
-            mainChar.position.set(currentCheckpoint.x, 0, currentCheckpoint.z);
-
-            recoverObjects();
-        }
-    }
 }
 
 function recoverObjects() {
@@ -433,6 +452,36 @@ function objectMovement(obj, axis, startPosition, endPosition) {
             objAnimation.start();
             break;
 
+        case 'blackHole-sizing':
+            objAnimation = new KF.KeyFrameAnimator;
+            objAnimation.init({ 
+                interps:
+                    [
+                        { 
+                            keys:[0, .5, 1], 
+                            values:[
+                                    { z : 0 },
+                                    { z : Math.PI },
+                                    { z : 2 * Math.PI },
+                                    ],
+                            target:obj.rotation
+                        },
+                        {
+                            keys:[0, .5, 1],
+                            values:[
+                                    { x: 1, y: 1 },
+                                    { x: 3, y: 3 },
+                                    { x: 1, y: 1}
+                                    ],
+                            target:obj.scale
+                        }
+                    ],
+                loop: true,
+                duration: duration * 3
+            });
+            objAnimation.start();
+            break;
+
     } 
 
 }
@@ -494,7 +543,7 @@ function onKeyDown(event)
         moveDown = true;
 
     if (event.keyCode == 32)
-        makeJump();
+        jump = true;
 }
 
 function onKeyUp(event)
@@ -524,6 +573,28 @@ function makeMove() {
 
     if (moveRight)
         mainChar.position.x += 0.2;
+
+    makeJump();
+}
+
+function makeJump() {
+
+    if (jump) {
+        jumping = true;
+        jump = false;
+    }
+
+    if (jumping) {
+        jumpPosition += 4;
+        mainChar.position.y = 4 * Math.sin(jumpPosition * Math.PI / 180);
+        
+        if (jumpPosition >= 180) {
+            jumpPosition = 0;
+            jumping = false;
+        }
+    }
+
+
 }
 
 
@@ -644,6 +715,7 @@ function createScene(canvas) {
 
 
     // Create jump animation
+    /*
     jumpAnimation = new KF.KeyFrameAnimator;
     jumpAnimation.init({ 
         interps:
@@ -661,6 +733,7 @@ function createScene(canvas) {
         loop: false,
         duration: duration
     });
+    */
 
     map = new THREE.Object3D;
     root.add(map);
