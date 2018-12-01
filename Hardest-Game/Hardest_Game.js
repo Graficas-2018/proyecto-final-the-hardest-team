@@ -41,11 +41,14 @@ var jumpPosition = 0;
 var blackHoleTexture = new THREE.TextureLoader().load('../images/blackHole.png');
 var jumpAnimation = null;
 
+var theCanvas = document.getElementById('webglcanvas');
+
 function createMap(theLevel) {
 
     switch(theLevel) {
         case 1:
             // Checkpoints
+            //camera.position.set(12, 6, 40);
             createCheckpoint(6, 16, new THREE.Vector3(0, 0, 0), false);
             createCheckpoint(6, 16, new THREE.Vector3(31, 0, 0), true);
 
@@ -126,6 +129,7 @@ function createMap(theLevel) {
     
 
 }
+
 
 function createBlackHole(circLeSize, position, animatedSizing) {
     material = new THREE.MeshPhongMaterial({color:0xffffff, map:blackHoleTexture, side:THREE.DoubleSide});
@@ -289,6 +293,8 @@ function doesItCrash() {
 
             if (collider.tag == 'coin' && !collider.took) {
                 console.log('Collides coin');
+
+                //coinCollect.play();
 
                 collider.object.visible = false;
                 collider.took = true;
@@ -687,16 +693,31 @@ function createScene(canvas) {
     camera.add( listener );
 
     // create a global audio source
-    var sound = new THREE.Audio( listener );
+    var mainSound = new THREE.Audio( listener );
 
     // load a sound and set it as the Audio object's buffer
     var audioLoader = new THREE.AudioLoader();
     audioLoader.load( '../audio/mainTheme.mp3', function( buffer ) {
-        sound.setBuffer( buffer );
-        sound.setLoop( true );
-        sound.setVolume( 0.5 );
-        sound.play();
+        mainSound.setBuffer( buffer );
+        mainSound.setLoop( true );
+        mainSound.setVolume( 0.5 );
+        mainSound.play();
     });
+
+    // Change background
+    let backgroundTexture = new THREE.TextureLoader().load( "../images/outer-space.jpg" );
+    backgroundTexture.wrapS = THREE.RepeatWrapping;
+    backgroundTexture.wrapT = THREE.RepeatWrapping;
+
+    scene.background = backgroundTexture;
+
+    /*var coinCollect = new THREE.Audio( listener );
+    audioLoader.load('../audio/coin_collect.wav', function(buffer) {
+        coinCollect.setBuffer(buffer);
+        coinCollect.setLoop(false);
+        coinCollect.setVolume(0.3);
+    });*/
+
 
 
 
@@ -712,28 +733,6 @@ function createScene(canvas) {
 
     //mainCharBoxHelper =new THREE.BoxHelper(mainChar, 0x00ff00);
     root.add(mainChar);
-
-
-    // Create jump animation
-    /*
-    jumpAnimation = new KF.KeyFrameAnimator;
-    jumpAnimation.init({ 
-        interps:
-        [
-            {
-                keys:[0, .5, 1],
-                values:[
-                        { y : 0 },
-                        { y : 10 },
-                        { y : 0},
-                        ],
-                target:mainChar.position
-            }
-        ],
-        loop: false,
-        duration: duration
-    });
-    */
 
     map = new THREE.Object3D;
     root.add(map);
