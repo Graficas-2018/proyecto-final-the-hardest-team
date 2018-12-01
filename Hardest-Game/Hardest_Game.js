@@ -635,6 +635,11 @@ function setLightColor(light, r, g, b)
     light.color.setRGB(r, g, b);
 }
 
+function startGame() {
+    mainChar.visible = true;
+    map.visible = true;
+}
+
 var directionalLight = null;
 var spotLight = null;
 var ambientLight = null;
@@ -738,6 +743,9 @@ function createScene(canvas) {
     root.add(map);
 
     createMap(whichLevel);
+
+    mainChar.visible = false;
+    map.visible = false;
     
     // Now add the group to our scene
     scene.add( root );
