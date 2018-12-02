@@ -7,8 +7,8 @@ robot_attack = null,
 flamingo = null,
 stork = null,
 group = null,
-map = null,
-orbitControls = null;
+map = null;
+//orbitControls = null;
 
 var robot_mixer = {};
 var deadAnimator;
@@ -34,7 +34,7 @@ var enemy;
 
 var mainCharBox;
 
-var whichLevel = 1;
+var whichLevel = 3;
 
 var jumpPosition = 0;
 
@@ -77,27 +77,27 @@ function createMap(theLevel) {
 
         case 2:
             // Checkpoints
-            createCheckpoint(8, 6, new THREE.Vector3(0, 0, 0), false);
-            createCheckpoint(8, 6, new THREE.Vector3(42, 0, 19), true);
+            createCheckpoint(8, 6, new THREE.Vector3(-5, 0, 0), false);
+            createCheckpoint(8, 6, new THREE.Vector3(37, 0, 19), true);
 
             // Common Land
-            createLand(50, 13, new THREE.Vector3(21, 0, 9.5));
+            createLand(50, 13, new THREE.Vector3(16, 0, 9.5));
 
             // Create Blackhole
-            createBlackHole(2, new THREE.Vector3(10, 0, 14), false);
-            createBlackHole(2, new THREE.Vector3(10, 0, 5), false);
-            createBlackHole(2, new THREE.Vector3(32, 0, 14), false);
-            createBlackHole(2, new THREE.Vector3(32, 0, 5), false);
+            createBlackHole(2, new THREE.Vector3(5, 0, 14), false);
+            createBlackHole(2, new THREE.Vector3(5, 0, 5), false);
+            createBlackHole(2, new THREE.Vector3(27, 0, 14), false);
+            createBlackHole(2, new THREE.Vector3(27, 0, 5), false);
 
             // Create Enemies
-            createEnemy(new THREE.Vector3(0, 0, 4.5), 'x', -4, 46);
-            createEnemy(new THREE.Vector3(0, 0, 7.5), 'x', -4, 46);
-            createEnemy(new THREE.Vector3(0, 0, 10.5), 'x', 46, -4);
-            createEnemy(new THREE.Vector3(0, 0, 13.5), 'x', 46, -4);
+            createEnemy(new THREE.Vector3(-5, 0, 4.5), 'x', -4, 46);
+            createEnemy(new THREE.Vector3(-5, 0, 7.5), 'x', -4, 46);
+            createEnemy(new THREE.Vector3(-5, 0, 10.5), 'x', 46, -4);
+            createEnemy(new THREE.Vector3(-5, 0, 13.5), 'x', 46, -4);
 
             // Create coins
-            createCoin(new THREE.Vector3(21, 0, 6));
-            createCoin(new THREE.Vector3(21, 0, 12));
+            createCoin(new THREE.Vector3(16, 0, 6));
+            createCoin(new THREE.Vector3(16, 0, 12));
 
             break;
 
@@ -121,6 +121,18 @@ function createMap(theLevel) {
             createEnemy(new THREE.Vector3(0, 0, 1.5), 'x', 3, 25);
             createEnemy(new THREE.Vector3(0, 0, -1.5), 'x', 25, 50);
             createEnemy(new THREE.Vector3(0, 0, 1.5), 'x', 25, 50);
+
+            createEnemy(new THREE.Vector3(10, 0, -1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(10, 0, 1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(17, 0, -1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(17, 0, 1.5), 'y', -5, 15);
+
+            createEnemy(new THREE.Vector3(36, 0, -1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(36, 0, 1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(43, 0, -1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(43, 0, 1.5), 'y', -5, 15);
+
+
 
             // Create coins
             createCoin(new THREE.Vector3(53, 0, 0));
@@ -393,7 +405,28 @@ function objectMovement(obj, axis, startPosition, endPosition) {
                     duration: duration
                 });
                 objAnimation.start();    
-            } else {
+            } 
+            else if(axis == 'y') {
+                objAnimation = new KF.KeyFrameAnimator;
+                objAnimation.init({ 
+                    interps:
+                        [
+                            { 
+                                keys:[0, .5, 1], 
+                                values:[
+                                        { y : startPosition },
+                                        { y : endPosition },
+                                        { y : startPosition },
+                                        ],
+                                target:obj.position
+                            }
+                        ],
+                    loop: true,
+                    duration: duration
+                });
+                objAnimation.start();    
+            } 
+            else {
                 objAnimation = new KF.KeyFrameAnimator;
                 objAnimation.init({ 
                     interps:
@@ -623,7 +656,7 @@ function run() {
         KF.update();
 
         // Update the camera controller
-        orbitControls.update();
+        //orbitControls.update();
 }
 
 function setLightColor(light, r, g, b)
@@ -665,10 +698,11 @@ function createScene(canvas) {
 
     // Add  a camera so we can view the scene
     camera = new THREE.PerspectiveCamera( 45, canvas.width / canvas.height, 1, 4000 );
-    camera.position.set(0, 6, 30);
+    camera.position.set(15.969033608493447,62.40480884725021, 59.75158845051619);
+    camera.rotation.set( -0.8178272683535693, 0.013799824779866679,  -0.0115690097);
     scene.add(camera);
-
-    orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+    //camera.rotation.set(-0.9434117713845896,  0.005698651184301411, 0.007858741267773053);
+    //orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
         
     // Create a group to hold all the objects
     root = new THREE.Object3D;
