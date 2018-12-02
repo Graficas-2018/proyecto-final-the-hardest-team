@@ -81,6 +81,21 @@ function initControls()
 </script>
 
 <style type="text/css">
+	#MenuLabel1 {
+		position:absolute;
+		display: block;
+		z-index: 10;
+		left: 2%;
+		top: 2%;
+	}
+	
+	#MenuLabel2 {
+		position:absolute;
+		display: block;
+		z-index: 10;
+		left: 50%;
+		top: 2%;
+	}
 	#title {
 		position: absolute;
 	    display: block;
@@ -156,9 +171,10 @@ function initControls()
 </head>
 
 <body>
-
 <div id="container">
+
     <canvas id="webglcanvas" width=800 height=600></canvas>
+    <h1><label id="MenuLabel1">Deaths:</label></h1>
     <img id="title" src="../images/Title.png" />
     <button id="start" class="button">Start Game</button>
     <button id="instructions_button" class="button">Instructions</button>

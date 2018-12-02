@@ -38,6 +38,8 @@ var whichLevel = 1;
 
 var jumpPosition = 0;
 
+var TotalDeaths =0;
+
 var blackHoleTexture = new THREE.TextureLoader().load('../images/blackHole.png');
 var jumpAnimation = null;
 
@@ -297,7 +299,7 @@ function updateMovementColliders() {
 
 function doesItCrash() {
     mainCharBox = new THREE.Box3().setFromCenterAndSize(mainChar.position, new THREE.Vector3( 2, 2, 2 ));
-
+    var alreadyCrashed=false;
     // Static colliders
      for (var collider of staticColliders) {
         if (mainCharBox.intersectsBox(collider)) {
@@ -328,6 +330,7 @@ function doesItCrash() {
                 } else {
                     if (collider.tag == 'blackHole') {
                         floorCollide = false;
+                        alreadyCrashed=true;
                     }
                 }
             }
@@ -341,10 +344,12 @@ function doesItCrash() {
         if (mainCharBox.intersectsBox(collider)) {
             if (collider.tag == 'blackHole-sizing')
                 floorCollide = false;
+                //alreadyCrashed=true;
 
             else {
                 console.log('Collides enemy');
                 mainChar.position.set(currentCheckpoint.x, 0, currentCheckpoint.z);
+                alreadyCrashed=true;
                 recoverObjects();
             }
         }
@@ -352,7 +357,15 @@ function doesItCrash() {
 
     if (!floorCollide && !jumping) {
         mainChar.position.set(currentCheckpoint.x, 0, currentCheckpoint.z);
+        //alreadyCrashed=true;
         recoverObjects();
+    }
+
+    if(alreadyCrashed==true)
+    {
+        TotalDeaths = TotalDeaths +1;
+        console.log("mori" + TotalDeaths);
+        document.getElementById("MenuLabel1").innerHTML = "Deaths: " + TotalDeaths;
     }
 
     floorCollide = false;
@@ -634,7 +647,6 @@ function makeMove() {
 
     if (moveRight)
         mainChar.position.x += 0.2;
-
     makeJump();
 }
 
@@ -706,7 +718,7 @@ function createScene(canvas) {
     
     // Create the Three.js renderer and attach it to our canvas
     renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
-
+    //document.getElementById("MenuLabel1").innerHTML = TotalDeaths;
     // Set the viewport size
     renderer.setSize(canvas.width, canvas.height);
 
