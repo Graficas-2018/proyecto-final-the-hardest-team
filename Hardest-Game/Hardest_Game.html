@@ -61,9 +61,20 @@ function initControls()
 		        $("#start").click(function() {
 		        	startGame();
 		        	$("#start").remove();
+		        	$("#instructions_button").remove();
 		        	$("#instructions").remove();
 		        	$("#title").remove();
 		        });
+
+		        $("#instructions_button").click(function() {
+		        	$("#instructionContainer").css("visibility", "visible");
+		        });
+
+		        $("#close_instructions").click(function() {
+		        	$("#instructionContainer").css("visibility", "hidden");
+		        });
+
+
 			}
 	);
 
@@ -73,14 +84,14 @@ function initControls()
 	#title {
 		position: absolute;
 	    display: block;
-	    z-index: 99;
+	    z-index: 10;
 	    left: -5%;
 	    top: 0%;
 	}
 	.button {
 		position: absolute;
 	    display: block;
-	    z-index: 99;
+	    z-index: 10;
 	    left: 35%;
 		-moz-box-shadow: 0px 10px 14px -7px #276873;
 		-webkit-box-shadow: 0px 10px 14px -7px #276873;
@@ -122,9 +133,24 @@ function initControls()
 		top: 50%;
 	}
 
-	#instructions {
+	#instructions_button {
 		top: 70%;
 	}
+
+	#instructionContainer {
+		position: absolute;
+		display: block;
+		z-index: 99;
+		top: 6%;
+		left: 6.25%;
+		visibility: hidden;
+	}
+
+	#instructions {
+		width: 700;
+		height: 500;
+	}
+
 </style>
 
 </head>
@@ -135,7 +161,11 @@ function initControls()
     <canvas id="webglcanvas" width=800 height=600></canvas>
     <img id="title" src="../images/Title.png" />
     <button id="start" class="button">Start Game</button>
-    <button id="instructions" class="button">Instructions</button>
+    <button id="instructions_button" class="button">Instructions</button>
+    <div id="instructionContainer">
+    	<img id="instructions" src="../images/theInstructions.png" /></br>
+    	<img id="close_instructions" src="../images/x.png" />
+    </div>
 </div>
 
 </body>
