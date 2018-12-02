@@ -103,39 +103,39 @@ function createMap(theLevel) {
 
         case 3:
             // Checkpoints
-            createCheckpoint(6, 6, new THREE.Vector3(0, 0, 0), true);
+            createCheckpoint(6, 6, new THREE.Vector3(-10, 0, 0), true);
 
             // Common Land
-            createLand(53, 6, new THREE.Vector3(29.5, 0, 0));
-            createLand(4, 4, new THREE.Vector3(16, 0, -5));
-            createLand(4, 4, new THREE.Vector3(26, 0, 5));
-            createLand(4, 4, new THREE.Vector3(36, 0, -5));
-            createLand(4, 4, new THREE.Vector3(46, 0, 5));
+            createLand(53, 6, new THREE.Vector3(19.5, 0, 0));
+            createLand(4, 4, new THREE.Vector3(6, 0, -5));
+            createLand(4, 4, new THREE.Vector3(21, 0, 5));
+            createLand(4, 4, new THREE.Vector3(26, 0, -5));
+            createLand(4, 4, new THREE.Vector3(36, 0, 5));
 
             // Create Blackhole
-            createBlackHole(1, new THREE.Vector3(25, 0, 0), true);
+            createBlackHole(1, new THREE.Vector3(17, 0, 0), true);
 
 
             // Create Enemies
-            createEnemy(new THREE.Vector3(0, 0, -1.5), 'x', 3, 25);
-            createEnemy(new THREE.Vector3(0, 0, 1.5), 'x', 3, 25);
-            createEnemy(new THREE.Vector3(0, 0, -1.5), 'x', 25, 50);
-            createEnemy(new THREE.Vector3(0, 0, 1.5), 'x', 25, 50);
+            createEnemy(new THREE.Vector3(-25, 0, -1.5), 'x', -7, 15);
+            createEnemy(new THREE.Vector3(-25, 0, 1.5), 'x', -7, 15);
+            createEnemy(new THREE.Vector3(-25, 0, -1.5), 'x', 15, 40);
+            createEnemy(new THREE.Vector3(-25, 0, 1.5), 'x', 15, 40);
 
-            createEnemy(new THREE.Vector3(10, 0, -1.5), 'y', -5, 15);
-            createEnemy(new THREE.Vector3(10, 0, 1.5), 'y', -5, 15);
-            createEnemy(new THREE.Vector3(17, 0, -1.5), 'y', -5, 15);
-            createEnemy(new THREE.Vector3(17, 0, 1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(0, 0, -1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(0, 0, 1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(7, 0, -1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(7, 0, 1.5), 'y', -5, 15);
 
-            createEnemy(new THREE.Vector3(36, 0, -1.5), 'y', -5, 15);
-            createEnemy(new THREE.Vector3(36, 0, 1.5), 'y', -5, 15);
-            createEnemy(new THREE.Vector3(43, 0, -1.5), 'y', -5, 15);
-            createEnemy(new THREE.Vector3(43, 0, 1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(26, 0, -1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(26, 0, 1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(33, 0, -1.5), 'y', -5, 15);
+            createEnemy(new THREE.Vector3(33, 0, 1.5), 'y', -5, 15);
 
 
 
             // Create coins
-            createCoin(new THREE.Vector3(53, 0, 0));
+            createCoin(new THREE.Vector3(43, 0, 0));
     }
 
     
@@ -720,8 +720,8 @@ function createScene(canvas) {
 
     // Add  a camera so we can view the scene
     camera = new THREE.PerspectiveCamera( 45, canvas.width / canvas.height, 1, 4000 );
-    camera.position.set(15.969033608493447,62.40480884725021, 59.75158845051619);
-    camera.rotation.set( -0.8178272683535693, 0.013799824779866679,  -0.0115690097);
+    camera.position.set(15.969033608493447,55.40480884725021, 55.75158845051619);
+    camera.rotation.set( -0.8178272683535693, 0.013799824779866679,  0);
     scene.add(camera);
     //camera.rotation.set(-0.9434117713845896,  0.005698651184301411, 0.007858741267773053);
     //orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
