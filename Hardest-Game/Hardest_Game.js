@@ -7,8 +7,8 @@ robot_attack = null,
 flamingo = null,
 stork = null,
 group = null,
-map = null,
-orbitControls = null;
+map = null;
+//orbitControls = null;
 
 var robot_mixer = {};
 var deadAnimator;
@@ -623,7 +623,7 @@ function run() {
         KF.update();
 
         // Update the camera controller
-        orbitControls.update();
+        //orbitControls.update();
 }
 
 function setLightColor(light, r, g, b)
@@ -665,10 +665,11 @@ function createScene(canvas) {
 
     // Add  a camera so we can view the scene
     camera = new THREE.PerspectiveCamera( 45, canvas.width / canvas.height, 1, 4000 );
-    camera.position.set(0, 6, 30);
+    camera.position.set(15.969033608493447,62.40480884725021, 59.75158845051619);
+    camera.rotation.set( -0.8178272683535693, 0.013799824779866679,  -0.0115690097);
     scene.add(camera);
-
-    orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+    //camera.rotation.set(-0.9434117713845896,  0.005698651184301411, 0.007858741267773053);
+    //orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
         
     // Create a group to hold all the objects
     root = new THREE.Object3D;
