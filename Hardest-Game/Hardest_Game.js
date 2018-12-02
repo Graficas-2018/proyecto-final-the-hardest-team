@@ -34,7 +34,7 @@ var enemy;
 
 var mainCharBox;
 
-var whichLevel = 3;
+var whichLevel = 1;
 
 var jumpPosition = 0;
 
