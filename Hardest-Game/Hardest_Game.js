@@ -369,16 +369,38 @@ function recoverObjects() {
 }
 
 function changeLevel(theLevel) {
-   removeObject = [];
-   moveObjects = [];
-   staticColliders = [];
-   movementColliders = [];
+    if (theLevel > 3){
+        objAnimation = new KF.KeyFrameAnimator;
+        objAnimation.init({ 
+        interps:
+                [
+                    { 
+                        keys:[0, .5, 1], 
+                        values:[
+                                { y : 0 },
+                                { y : 4 },
+                                { y : 0 },
+                                ],
+                        target:mainChar.position
+                    }
+                ],
+                loop: true,
+                duration: duration / 3
+        });
+        objAnimation.start();
 
-   for (var i = map.children.length - 1; i >= 0; i--) {
-    map.remove(map.children[i])
-   }
+    } else {
+       removeObject = [];
+       moveObjects = [];
+       staticColliders = [];
+       movementColliders = [];
 
-   createMap(theLevel);
+       for (var i = map.children.length - 1; i >= 0; i--) {
+        map.remove(map.children[i])
+       }
+
+       createMap(theLevel);
+    }
 
 
 }
