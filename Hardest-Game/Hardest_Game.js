@@ -402,6 +402,11 @@ function changeLevel(theLevel) {
         });
         objAnimation.start();
 
+        $("#MenuLabel1").css("left", "20%");
+        $("#MenuLabel1").css("top", "53%");
+        $("#MenuLabel1").css("font-size", "50px");
+        document.getElementById("MenuLabel1").innerHTML = "You WIN With " + TotalDeaths + " deaths!";
+
     } else {
        removeObject = [];
        moveObjects = [];
